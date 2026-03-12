@@ -58,9 +58,9 @@ class TestPrintingPrinterWebSocket(TestPrintingPrinterBase):
             type(self.env["bus.bus"]),
             "_sendone",
         ) as mock_sendone:
-            with mock.patch(
-                "odoo.addons.base_report_to_printer.models."
-                "printing_printer.PrintingPrinter.print_file"
+            with mock.patch.object(
+                type(self.env["printing.printer"]),
+                "print_file",
             ):
                 printer.print_document(report, b"test")
             mock_sendone.assert_not_called()
@@ -77,3 +77,27 @@ class TestPrintingPrinterWebSocket(TestPrintingPrinterBase):
             printer.print_document(report, b"test")
             payload = mock_sendone.call_args[0][2]
             self.assertEqual(payload["printer_name"], "")
+
+    def test_print_document_custom_channel(self):
+        """print_document should use the configured websocket_channel."""
+        self.printer_vals["websocket_channel"] = "warehouse_1"
+        printer = self.new_record()
+        report = self.env["ir.actions.report"].search([], limit=1)
+        with mock.patch.object(
+            type(self.env["bus.bus"]),
+            "_sendone",
+        ) as mock_sendone:
+            printer.print_document(report, b"test")
+            self.assertEqual(mock_sendone.call_args[0][0], "warehouse_1")
+
+    def test_print_document_empty_channel_falls_back(self):
+        """When websocket_channel is empty, it should fall back to 'printer'."""
+        self.printer_vals["websocket_channel"] = ""
+        printer = self.new_record()
+        report = self.env["ir.actions.report"].search([], limit=1)
+        with mock.patch.object(
+            type(self.env["bus.bus"]),
+            "_sendone",
+        ) as mock_sendone:
+            printer.print_document(report, b"test")
+            self.assertEqual(mock_sendone.call_args[0][0], "printer")

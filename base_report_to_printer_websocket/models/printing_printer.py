@@ -17,6 +17,11 @@ class PrintingPrinter(models.Model):
         selection_add=[("websocket", "WebSocket")],
         ondelete={"websocket": "cascade"},
     )
+    websocket_channel = fields.Char(
+        string="WebSocket Channel",
+        default="printer",
+        help="Channel name used to route print jobs to the correct WebSocket client.",
+    )
 
     def print_document(
         self, report, content, action=None, doc_format="qweb-pdf", **kwargs
@@ -32,7 +37,9 @@ class PrintingPrinter(models.Model):
         payload = {
             "printer_name": self.system_name or "",
             "file_data": pdf_b64,
+            "file_type": doc_format,
         }
-        self.env["bus.bus"]._sendone("printer", "print_job", payload)
+        channel = self.websocket_channel or "printer"
+        self.env["bus.bus"]._sendone(channel, "print_job", payload)
         _logger.info("Print job sent via WebSocket to printer '%s'", self.name)
         return True

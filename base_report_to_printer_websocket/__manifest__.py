@@ -10,7 +10,9 @@
     "website": "https://github.com/OCA/report-print-send",
     "license": "AGPL-3",
     "depends": ["base_report_to_printer", "bus"],
-    "data": [],
+    "data": [
+        "views/printing_printer.xml",
+    ],
     "assets": {
         "web.assets_backend": [
             "/base_report_to_printer_websocket/static/src/js/qweb_action_manager.esm.js",
