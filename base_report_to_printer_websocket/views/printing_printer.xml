@@ -11,7 +11,11 @@
         <field name="model">printing.printer</field>
         <field name="arch" type="xml">
             <group name="name" position="inside">
-                <field name="websocket_channel" invisible="backend != 'websocket'" />
+                <field
+                    name="websocket_user_id"
+                    invisible="backend != 'websocket'"
+                    required="backend == 'websocket'"
+                />
             </group>
         </field>
     </record>

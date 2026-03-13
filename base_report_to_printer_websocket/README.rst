@@ -130,8 +130,13 @@ Authors
 Contributors
 ------------
 
-- David Jiménez david.jimenez@forgeflow.com
-- Enric Tobella enric.tobella@dixmit.com
+- `ForgeFlow <https://forgeflow.com>`__:
+
+  - David Jiménez david.jimenez@forgeflow.com
+
+- `Dixmit <https://dixmit.com>`__:
+
+  - Enric Tobella
 
 Maintainers
 -----------

@@ -17,10 +17,8 @@ class PrintingPrinter(models.Model):
         selection_add=[("websocket", "WebSocket")],
         ondelete={"websocket": "cascade"},
     )
-    websocket_channel = fields.Char(
-        string="WebSocket Channel",
-        default="printer",
-        help="Channel name used to route print jobs to the correct WebSocket client.",
+    websocket_user_id = fields.Many2one(
+        "res.users",
     )
 
     def print_document(
@@ -39,7 +37,6 @@ class PrintingPrinter(models.Model):
             "file_data": pdf_b64,
             "file_type": doc_format,
         }
-        channel = self.websocket_channel or "printer"
-        self.env["bus.bus"]._sendone(channel, "print_job", payload)
+        self.env["bus.bus"]._sendone(self, "print_job", payload)
         _logger.info("Print job sent via WebSocket to printer '%s'", self.name)
         return True

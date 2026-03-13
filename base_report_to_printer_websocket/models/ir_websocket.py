@@ -9,15 +9,16 @@ class IrWebsocket(models.AbstractModel):
     _inherit = "ir.websocket"
 
     def _build_bus_channel_list(self, channels):
-        ws_channels = set(
+        websocket_printers = (
             self.env["printing.printer"]
             .sudo()
-            .search([("backend", "=", "websocket"), ("websocket_channel", "!=", False)])
-            .mapped("websocket_channel")
+            .search(
+                [
+                    ("backend", "=", "websocket"),
+                    ("websocket_user_id", "=", self.env.uid),
+                ]
+            )
         )
-        is_printing_user = self.env.uid and self.env.user.has_group(
-            "base_report_to_printer.printing_group_user"
-        )
-        if not is_printing_user:
-            channels = [ch for ch in channels if ch not in ws_channels]
+        for printer in websocket_printers:
+            channels.append(printer)
         return super()._build_bus_channel_list(channels)
